@@ -3,6 +3,7 @@ import math
 
 
 def tokenize(message):
+
 	message = message.lower()
 	words = re.findall(r'[a-z0-9]+', message)
 	return set(words);
