@@ -151,3 +151,12 @@ def extract_email(text):
 	pattern = re.compile(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}')
 	match = pattern.search(text)
 	return match.group() if match else None
+
+
+if __name__ == "__main__":
+	# Load and split data
+	ds_texts = getMessages("DSResumes.txt")
+	other_texts = getMessages("OtherResumes.txt")
+
+	ds_train, ds_test = split_train_test(ds_texts)
+	other_train, other_test = split_train_test(other_texts)

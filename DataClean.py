@@ -1,6 +1,22 @@
 
 import os
 import re
+import PyPDF2
+
+
+def extract_text_from_pdf(folder_name):
+    texts = []
+    list_of_files = os.listdir(folder_name)
+    for item in list_of_files:
+        file_path = os.path.join(folder_name, item)
+        with open(file_path, 'rb') as file:
+            reader = PyPDF2.PdfFileReader(file)
+            text = ""
+            for page in range(reader.numPages):
+                text += reader.getPage(page).extractText()
+            texts.append(text)
+    return texts
+
 
 def getText(name):
 	list = os.listdir("data\Archive\\"+name)
