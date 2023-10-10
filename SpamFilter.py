@@ -1,5 +1,6 @@
 import re
 import math
+import os
 
 
 def tokenize(message):
@@ -130,3 +131,7 @@ def classify():
 	print("Good Spam", goodSpam, goodSpam / len(spamTest))
 
 classify()
+
+def split_train_test(data, split_ratio=0.75):
+	train_num = int(len(data) * split_ratio)
+	return data[:train_num], data[train_num:]
