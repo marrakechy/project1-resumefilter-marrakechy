@@ -184,5 +184,7 @@ if __name__ == "__main__":
 	ds_phone_numbers = [extract_phone(resume) for resume in classified_as_ds]
 	other_emails = [extract_email(resume) for resume in classified_as_other]
 
+	save_to_file("ds_phone_numbers.txt", ds_phone_numbers)
+	save_to_file("other_emails.txt", other_emails)
 
 
