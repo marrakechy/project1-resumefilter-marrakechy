@@ -146,3 +146,8 @@ def extract_phone(text):
 	pattern = re.compile(r'\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}')
 	match = pattern.search(text)
 	return match.group() if match else None
+
+def extract_email(text):
+	pattern = re.compile(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}')
+	match = pattern.search(text)
+	return match.group() if match else None
