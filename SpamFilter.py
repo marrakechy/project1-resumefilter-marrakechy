@@ -153,6 +153,12 @@ def extract_email(text):
 	return match.group() if match else None
 
 
+def save_to_file(filename, data):
+    with open(filename, 'w') as f:
+        for item in data:
+            if item:  # Ensure we're not saving None values
+                f.write("%s\n" % item)
+
 if __name__ == "__main__":
 	# Load and split data
 	ds_texts = getMessages("DSResumes.txt")
