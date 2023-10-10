@@ -135,3 +135,9 @@ classify()
 def split_train_test(data, split_ratio=0.75):
 	train_num = int(len(data) * split_ratio)
 	return data[:train_num], data[train_num:]
+
+def keyword_classifier(text, keywords):
+	for keyword in keywords:
+		if keyword in text:
+			return "DS"
+	return "Other"
