@@ -160,3 +160,23 @@ if __name__ == "__main__":
 
 	ds_train, ds_test = split_train_test(ds_texts)
 	other_train, other_test = split_train_test(other_texts)
+
+	word_counts = getWordCount(ds_train, other_train)
+	probs = Train()
+
+	ds_keywords = ["Machine learning", "Data Science", "Natural Language Processing"]
+	classified_as_ds = []
+	classified_as_other = []
+
+	for resume in known_texts:
+		if keyword_classifier(resume, ds_keywords) == "DS":
+			classified_as_ds.append(resume)
+		else:
+			classified_as_other.append(resume)
+
+
+	ds_phone_numbers = [extract_phone(resume) for resume in classified_as_ds]
+	other_emails = [extract_email(resume) for resume in classified_as_other]
+
+
+
