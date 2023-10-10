@@ -141,3 +141,8 @@ def keyword_classifier(text, keywords):
 		if keyword in text:
 			return "DS"
 	return "Other"
+
+def extract_phone(text):
+	pattern = re.compile(r'\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}')
+	match = pattern.search(text)
+	return match.group() if match else None
