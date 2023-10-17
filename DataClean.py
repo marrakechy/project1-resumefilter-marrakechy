@@ -1,35 +1,5 @@
 import os
 import re
-import PyPDF2
-
-
-def extract_text_from_pdf(folder_name):
-    texts = []
-    list_of_files = os.listdir(folder_name)
-    for item in list_of_files:
-        file_path = os.path.join(folder_name, item)
-        with open(file_path, 'rb') as file:
-            reader = PyPDF2.PdfFileReader(file)
-            text = ""
-            for page in range(reader.numPages):
-                text += reader.getPage(page).extractText()
-            texts.append(text)
-    return texts
-
-def save_to_file(filename, texts):
-    with open(filename, "w") as file:
-        for text in texts:
-            file.write(text + "\n")
-
-if __name__ == "__main__":
-    ds_texts = extract_text_from_pdf("DSResumes")
-    other_texts = extract_text_from_pdf("OtherResumes")
-    unknown_texts = extract_text_from_pdf("UnknownResumes")
-
-    save_to_file("DSResumes.txt", ds_texts)
-    save_to_file("OtherResumes.txt", other_texts)
-    save_to_file("UnknownResumes.txt", unknown_texts)
-
 
 def getText(name):
 	list = os.listdir("data\Archive\\"+name)
