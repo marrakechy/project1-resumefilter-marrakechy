@@ -119,8 +119,8 @@ def classify():
     probs = Train()
     probs = filterProbs(probs, 100)
     print("Len Probs: ", len(probs))
-    spamTest = getMessages("data/spamText_test.txt")
-    hamTest = getMessages("data/hamText_test.txt")
+    spamTest = getMessages("data/DSResumes.txt")
+    hamTest = getMessages("data/OtherResumes.txt")
 
     goodHam = 0
     goodSpam = 0
