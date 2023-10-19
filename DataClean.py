@@ -45,6 +45,7 @@ DSResumes_path = r"C:\Users\test1\PycharmProjects\project1-resumefilter-marrakec
 OtherResumes_path = r"C:\Users\test1\PycharmProjects\project1-resumefilter-marrakechy\data\OtherResumes"
 UnknownResumes_path = r"C:\Users\test1\PycharmProjects\project1-resumefilter-marrakechy\data\UnknownResumes"
 
+
 def extract_text_from_pdfs(path, output_file_name):
     # get list of pdfs in the specified directory
     pdf_list = [file for file in os.listdir(path) if file.lower().endswith('.pdf')]
@@ -73,4 +74,12 @@ extract_text_from_pdfs(UnknownResumes_path, "UnknownResumes.txt")
 
 
 
+
+def extract_phone_numbers(text):
+    pattern = re.compile(r'(\+?(\d{1,3})?[-.\s]?)?(\(?\d{3}\)?[-.\s]?)?(\d{3}[-.\s]?)\d{4}')
+    return pattern.findall(text)
+
+def extract_emails(text):
+    pattern = re.compile(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}')
+    return pattern.findall(text)
 

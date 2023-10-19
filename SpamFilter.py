@@ -35,16 +35,16 @@ def getWordCount(spam, ham):
 
 
 def Train():
-    spamTrain = getMessages("data/SpamText_train.txt")
-    hamTrain = getMessages("data/hamText_train.txt")
+    spamTrain = getMessages("data/DSResume.txt")
+    hamTrain = getMessages("data/OtherResumes.txt")
     print("Lengths:", len(spamTrain), len(hamTrain))
 
     wc = getWordCount(spamTrain, hamTrain)
 
     print(len(wc))
 
-    k = .5
-    minCount = 5
+    k = .75
+    minCount = .25
 
     ''' 
 	Make a list of tuples:  
@@ -133,8 +133,24 @@ def classify():
         if getSpamProb(msg, probs) > .5:
             goodSpam += 1
 
-    print("Good Ham", goodHam, goodHam / len(hamTest))
-    print("Good Spam", goodSpam, goodSpam / len(spamTest))
+    print("Classified as DS", goodHam, goodHam / len(hamTest))
+    print("Classified as Other", goodSpam, goodSpam / len(spamTest))
 
 
 classify()
+
+
+def keyword_classifier(resume_list, keywords):
+    classified_as_DS = 0
+
+    for resume in resume_list:
+        if any(keyword in resume for keyword in keywords):
+            classified_as_DS += 1
+
+    return classified_as_DS
+
+#testing with sample keywords
+keywords = ['data', 'machine', 'learning', 'python', 'statistics']
+unknown_resumes = getMessages("data/UnknownResumes.txt")
+classified_as_DS = keyword_classifier(unknown_resumes, keywords)
+print("Keyword Classified as DS:", classified_as_DS)
