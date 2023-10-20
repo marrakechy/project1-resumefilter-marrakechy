@@ -136,7 +136,6 @@ def classify():
     print("Classified as DS", goodHam, goodHam / len(hamTest))
     print("Classified as Other", goodSpam, goodSpam / len(spamTest))
 
-
 classify()
 
 
@@ -154,3 +153,35 @@ keywords = ['data', 'machine', 'learning', 'python', 'statistics']
 unknown_resumes = getMessages("data/UnknownResumes.txt")
 classified_as_DS = keyword_classifier(unknown_resumes, keywords)
 print("Keyword Classified as DS:", classified_as_DS)
+
+
+def extract_phone_numbers(text):
+    pattern = re.compile(r'(\+?(\d{1,3})?[-.\s]?)?(\(?\d{3}\)?[-.\s]?)?(\d{3}[-.\s]?)\d{4}')
+    return pattern.findall(text)
+
+def extract_emails(text):
+    pattern = re.compile(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}')
+    return pattern.findall(text)
+
+
+def main():
+	probs = Train()
+	probs = filterProbs(probs, 100)
+
+	# Naive Bayes Classification
+	unknown_probs = classify(probs)
+
+	# Keyword-based Classification
+	classified_as_DS = keyword_classifier(unknown_resumes, keywords)
+	print("Keyword Classified as DS:", classified_as_DS)
+
+	# Extract Contact Info
+	for index, prob in enumerate(unknown_probs):
+		if prob > 0.5:  # DS Resume
+			print("DS Resume - Phone Numbers:", extract_phone_numbers(unknown_resumes[index]))
+		else:  # Other Resume
+			print("Other Resume - Emails:", extract_emails(unknown_resumes[index]))
+
+
+if __name__ == "__main__":
+	main()

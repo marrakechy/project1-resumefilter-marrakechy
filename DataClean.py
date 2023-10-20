@@ -1,14 +1,13 @@
 import os
 import re
 from PyPDF2 import PdfReader
-import random
 
 
 def getText(name):
-	list = os.listdir("data\Archive\\"+name)
+	list = os.listdir("data\DSResume\\"+name)
 	outfile = open("data\\"+name+"Text.txt","w")
 	for item in list:
-		with open("data\Archive\\"+name+"\\"+item) as infile:
+		with open("data\DSResume\\"+name+"\\"+item) as infile:
 			try:
 				data = infile.read()
 				match = re.search("\n\n",data)
@@ -36,8 +35,8 @@ def makeTrain(fname, size):
 		for line in data[trainNum:]:
 			print(line, file=outfile)
 
-#makeTrain("data/hamText.txt",.85)
-#makeTrain("data/spamText.txt",.85)
+#makeTrain("newFiles/DSResumes.txt",.75)
+#makeTrain("newFiles/OtherResumes.txt",.25)
 
 
 #absolute paths to your directories
@@ -61,25 +60,13 @@ def extract_text_from_pdfs(path, output_file_name):
                 reader = PdfReader(pdf_file)
                 for page in reader.pages:
                     extracted_text = page.extract_text()
-                    if extracted_text:  # ensure that there's text before writing
+                    if extracted_text:  # make sure that there's text before writing
                         full_text_for_pdf.append(extracted_text.replace('\n', ' '))
 
             # after reading all pages from a PDF, write its content in one line to the outfile
             outfile.write(' '.join(full_text_for_pdf) + '\n')
 
 #extracting texts and writing
-extract_text_from_pdfs(DSResumes_path, "DSResumes.txt")
-extract_text_from_pdfs(OtherResumes_path, "OtherResumes.txt")
-extract_text_from_pdfs(UnknownResumes_path, "UnknownResumes.txt")
-
-
-
-
-def extract_phone_numbers(text):
-    pattern = re.compile(r'(\+?(\d{1,3})?[-.\s]?)?(\(?\d{3}\)?[-.\s]?)?(\d{3}[-.\s]?)\d{4}')
-    return pattern.findall(text)
-
-def extract_emails(text):
-    pattern = re.compile(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}')
-    return pattern.findall(text)
-
+extract_text_from_pdfs(DSResumes_path, "data/DSResumes.txt")
+extract_text_from_pdfs(OtherResumes_path, "data/OtherResumes.txt")
+extract_text_from_pdfs(UnknownResumes_path, "data/UnknownResumes.txt")
