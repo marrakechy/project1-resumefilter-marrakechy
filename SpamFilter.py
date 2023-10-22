@@ -9,7 +9,7 @@ def tokenize(message):
 
 
 def getMessages(fname):
-    with open(fname) as infile:
+    with open(fname, encoding='utf-8') as infile:
         data = [msg.strip() for msg in infile]
     return data
 
@@ -35,7 +35,7 @@ def getWordCount(spam, ham):
 
 
 def Train():
-    spamTrain = getMessages("data/DSResume.txt")
+    spamTrain = getMessages("data/DSResumes.txt")
     hamTrain = getMessages("data/OtherResumes.txt")
     print("Lengths:", len(spamTrain), len(hamTrain))
 

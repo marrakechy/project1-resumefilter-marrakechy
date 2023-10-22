@@ -4,7 +4,7 @@ from PyPDF2 import PdfReader
 
 
 def getText(name):
-	list = os.listdir("data\DSResume\\"+name)
+	list = os.listdir("data\DSResumes\\"+name)
 	outfile = open("data\\"+name+"Text.txt","w")
 	for item in list:
 		with open("data\DSResume\\"+name+"\\"+item) as infile:
@@ -23,20 +23,20 @@ def getText(name):
 
 def makeTrain(fname, size):
 
-	with open(fname) as infile:
+	with open(fname, 'r', encoding='utf-8', errors= 'replace') as infile:
 		data = [msg.strip() for msg in infile]
 	trainNum = int(len(data)*size)
 
 	pre, ext = fname.split(".")
-	with open (pre+"_train."+ext,"w") as outfile:
+	with open (pre+"_train."+ext,"w", encoding='utf-8') as outfile:
 		for line in data[:trainNum]:
 			print(line, file = outfile)
-	with open(pre + "_test." + ext, "w") as outfile:
+	with open(pre + "_test." + ext, "w", encoding='utf-8') as outfile:
 		for line in data[trainNum:]:
 			print(line, file=outfile)
 
-#makeTrain("newFiles/DSResumes.txt",.75)
-#makeTrain("newFiles/OtherResumes.txt",.25)
+makeTrain("data/DSResumes.txt",.75)
+makeTrain("data/OtherResumes.txt",.25)
 
 
 #absolute paths to your directories
