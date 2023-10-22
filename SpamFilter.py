@@ -5,8 +5,44 @@ import math
 def tokenize(message):
     message = message.lower()
     words = re.findall(r'[a-z0-9]+', message)
+
     return set(words);
 
+keywords = ['python', 'statistics', 'machine learning', 'data', 'analytics']
+
+
+def getMessages(fname):
+    with open(fname, encoding='utf-8') as infile:
+        data = [msg.strip() for msg in infile]
+    return data
+
+def single_keyword_classifier(keyword, messages):
+    classified_as_DS = sum(keyword in tokenize(message) for message in messages)
+    return classified_as_DS
+
+#calculate accuracy for each keyword:
+DS_messages = getMessages("data/DSResumes.txt")
+Other_messages = getMessages("data/OtherResumes.txt")
+
+for keyword in keywords:
+    DS_classified = single_keyword_classifier(keyword, DS_messages)
+    Other_classified = len(Other_messages) - single_keyword_classifier(keyword, Other_messages)
+    total_DS = len(DS_messages)
+    total_Other = len(Other_messages)
+    accuracy_DS = DS_classified / total_DS
+    accuracy_Other = Other_classified / total_Other
+    print(f"Keyword: {keyword}, accuracy on DS: {accuracy_DS:.2f}, accuracy on Other: {accuracy_Other:.2f}")
+
+
+def multi_keyword_classifier(keywords, messages):
+    classified_as_DS = sum(any(k in tokenize(message) for k in keywords) for message in messages)
+    return classified_as_DS
+
+DS_classified = multi_keyword_classifier(keywords, DS_messages)
+Other_classified = len(Other_messages) - multi_keyword_classifier(keywords, Other_messages)
+accuracy_DS = DS_classified / total_DS
+accuracy_Other = Other_classified / total_Other
+print(f"Multi-keyword Classifier, accuracy on DS: {accuracy_DS:.2f}, accuracy on Other: {accuracy_Other:.2f}")
 
 def getMessages(fname):
     with open(fname, encoding='utf-8') as infile:
@@ -139,49 +175,49 @@ def classify():
 classify()
 
 
-def keyword_classifier(resume_list, keywords):
-    classified_as_DS = 0
-
-    for resume in resume_list:
-        if any(keyword in resume for keyword in keywords):
-            classified_as_DS += 1
-
-    return classified_as_DS
-
-#testing with sample keywords
-keywords = ['data', 'machine', 'learning', 'python', 'statistics']
-unknown_resumes = getMessages("data/UnknownResumes.txt")
-classified_as_DS = keyword_classifier(unknown_resumes, keywords)
-print("Keyword Classified as DS:", classified_as_DS)
-
-
-def extract_phone_numbers(text):
-    pattern = re.compile(r'(\+?(\d{1,3})?[-.\s]?)?(\(?\d{3}\)?[-.\s]?)?(\d{3}[-.\s]?)\d{4}')
-    return pattern.findall(text)
-
-def extract_emails(text):
-    pattern = re.compile(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}')
-    return pattern.findall(text)
-
-
-def main():
-	probs = Train()
-	probs = filterProbs(probs, 100)
-
-	# Naive Bayes Classification
-	unknown_probs = classify(probs)
-
-	# Keyword-based Classification
-	classified_as_DS = keyword_classifier(unknown_resumes, keywords)
-	print("Keyword Classified as DS:", classified_as_DS)
-
-	# Extract Contact Info
-	for index, prob in enumerate(unknown_probs):
-		if prob > 0.5:  # DS Resume
-			print("DS Resume - Phone Numbers:", extract_phone_numbers(unknown_resumes[index]))
-		else:  # Other Resume
-			print("Other Resume - Emails:", extract_emails(unknown_resumes[index]))
-
-
-if __name__ == "__main__":
-	main()
+# def keyword_classifier(resume_list, keywords):
+#     classified_as_DS = 0
+#
+#     for resume in resume_list:
+#         if any(keyword in resume for keyword in keywords):
+#             classified_as_DS += 1
+#
+#     return classified_as_DS
+#
+# #testing with sample keywords
+# keywords = ['data', 'machine', 'learning', 'python', 'statistics']
+# unknown_resumes = getMessages("data/UnknownResumes.txt")
+# classified_as_DS = keyword_classifier(unknown_resumes, keywords)
+# print("Keyword Classified as DS:", classified_as_DS)
+#
+#
+# def extract_phone_numbers(text):
+#     pattern = re.compile(r'(\+?(\d{1,3})?[-.\s]?)?(\(?\d{3}\)?[-.\s]?)?(\d{3}[-.\s]?)\d{4}')
+#     return pattern.findall(text)
+#
+# def extract_emails(text):
+#     pattern = re.compile(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}')
+#     return pattern.findall(text)
+#
+#
+# def main():
+# 	probs = Train()
+# 	probs = filterProbs(probs, 100)
+#
+# 	# Naive Bayes Classification
+# 	unknown_probs = classify(probs)
+#
+# 	# Keyword-based Classification
+# 	classified_as_DS = keyword_classifier(unknown_resumes, keywords)
+# 	print("Keyword Classified as DS:", classified_as_DS)
+#
+# 	# Extract Contact Info
+# 	for index, prob in enumerate(unknown_probs):
+# 		if prob > 0.5:  # DS Resume
+# 			print("DS Resume - Phone Numbers:", extract_phone_numbers(unknown_resumes[index]))
+# 		else:  # Other Resume
+# 			print("Other Resume - Emails:", extract_emails(unknown_resumes[index]))
+#
+#
+# if __name__ == "__main__":
+# 	main()
