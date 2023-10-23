@@ -166,7 +166,7 @@ def extract_phone_number(message):
     return match.group() if match else None
 
 def extract_email(message):
-    email_pattern = r'[\w.-]+@[\w.-]+\.[a-zA-Z]{2,4}'
+    email_pattern =  r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
     match = re.search(email_pattern, message)
     if match:
         return match.group()
@@ -182,13 +182,14 @@ def read_pdf_content(file_path):
     return content
 
 
+
 def classify_unknown_resumes():
-    # Train the classifier using DS and Other resumes
+    #train the classifier using DS and Other resumes
     probs = Train()
     probs = filterProbs(probs, 100)
     print("Len Probs: ", len(probs))
 
-    # Load unknown resumes
+    #load unknown resumes
     unknown_resumes = getMessages("data/UnknownResumes.txt")
 
     ds_classified_without_phone = []
@@ -204,15 +205,15 @@ def classify_unknown_resumes():
             else:
                 print("Classified as DS with phone number:", phone_number)
 
-        # If the message is classified as Other
+        #if the message is classified as Other
         else:
             email = extract_email(msg)
             if not email:
                 other_classified_without_email.append(msg)
             else:
-                print(f"Classified as Other with email: {email}")
+                print("Classified as Other with email:", email)
 
-    # Identify resumes from which we couldn't extract the contact information
+    #identify resumes from which we couldn't extract the contact information
     not_extracted_resumes.extend(ds_classified_without_phone)
     not_extracted_resumes.extend(other_classified_without_email)
 
@@ -221,7 +222,6 @@ def classify_unknown_resumes():
     print(f"Resumes from which contact information couldn't be extracted:", len(not_extracted_resumes))
 
 
-# Call the function to classify and extract contact info from unknown resumes
 classify_unknown_resumes()
 
 # def classify_unknown_resumes():
