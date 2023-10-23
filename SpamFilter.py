@@ -166,7 +166,7 @@ def extract_phone_number(message):
     return match.group() if match else None
 
 def extract_email(message):
-    email_pattern =  r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
+    email_pattern =  [r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b']
     match = re.search(email_pattern, message)
     if match:
         return match.group()
@@ -188,6 +188,23 @@ def classify_unknown_resumes():
     probs = Train()
     probs = filterProbs(probs, 100)
     print("Len Probs: ", len(probs))
+
+    spamTest = getMessages("data/DSResumes.txt")
+    hamTest = getMessages("data/OtherResumes.txt")
+
+    goodHam = 0
+    goodSpam = 0
+
+    for msg in hamTest:
+        if getSpamProb(msg, probs) <= .5:
+            goodHam += 1
+
+    for msg in spamTest:
+        if getSpamProb(msg, probs) > .5:
+            goodSpam += 1
+
+    print("Classified as DS", goodHam, goodHam / len(hamTest))
+    print("Classified as Other", goodSpam, goodSpam / len(spamTest))
 
     #load unknown resumes
     unknown_resumes = getMessages("data/UnknownResumes.txt")
@@ -217,76 +234,11 @@ def classify_unknown_resumes():
     not_extracted_resumes.extend(ds_classified_without_phone)
     not_extracted_resumes.extend(other_classified_without_email)
 
-    print(f"Resumes classified as DS without phone numbers:", len(ds_classified_without_phone))
-    print(f"Resumes classified as Other without emails:", len(other_classified_without_email))
-    print(f"Resumes from which contact information couldn't be extracted:", len(not_extracted_resumes))
-
+    print("Resumes classified as DS without phone numbers:", len(ds_classified_without_phone))
+    print("Resumes classified as Other without emails:", len(other_classified_without_email))
+    print("Resumes from which contact information couldn't be extracted:", len(not_extracted_resumes))
 
 classify_unknown_resumes()
-
-# def classify_unknown_resumes():
-#     # Train the classifier using DS and Other resumes
-#     probs = Train()
-#     probs = filterProbs(probs, 100)
-#     print("Len Probs: ", len(probs))
-#
-#     # Load unknown resumes
-#     unknown_resumes = getMessages("data/UnknownResumes.txt")
-#
-#     ds_classified_without_phone = []
-#     other_classified_without_email = []
-#
-#     for msg in unknown_resumes:
-#         # If the message is classified as DS
-#         if getSpamProb(msg, probs) <= .5:
-#             phone_number = extract_phone_number(msg)
-#             if not phone_number:
-#                 ds_classified_without_phone.append(msg)
-#             else:
-#                 print(f"Classified as DS with phone number: {phone_number}")
-#
-#         # If the message is classified as Other
-#         else:
-#             email = extract_email(msg)
-#             if not email:
-#                 other_classified_without_email.append(msg)
-#             else:
-#                 print(f"Classified as Other with email: {email}")
-#
-#     print(f"Resumes classified as DS without phone numbers:", len(ds_classified_without_phone))
-#     print(f"Resumes classified as Other without emails:", len(other_classified_without_email))
-#
-#
-# # Call the function to classify and extract contact info from unknown resumes
-# classify_unknown_resumes()
-
-# def classify():
-#     probs = Train()
-#     probs = filterProbs(probs, 100)
-#     print("Len Probs: ", len(probs))
-#     spamTest = getMessages("data/DSResumes.txt")
-#     hamTest = getMessages("data/OtherResumes.txt")
-#
-#
-#     ds_without_contact_info = []
-#     other_without_contact_info = []
-#
-#     for msg in hamTest:
-#         if getSpamProb(msg, probs) <= .5:
-#             phone_number = extract_phone_number(msg)
-#             if not phone_number:
-#                 ds_without_contact_info.append(msg)
-#
-#     for msg in spamTest:
-#         if getSpamProb(msg, probs) > .5:
-#             email = extract_email(msg)
-#             if not email:
-#                 other_without_contact_info.append(msg)
-#
-#     print(f"DS Resumes without phone numbers:", len(ds_without_contact_info))
-#     print(f"Other Resumes without emails:", len(other_without_contact_info))
-#
-# classify()
 
 
 
