@@ -1,5 +1,7 @@
 import re
 import math
+import PyPDF2
+from PyPDF2 import PdfReader
 
 
 def tokenize(message):
@@ -151,73 +153,169 @@ def getSpamProb(message, word_probs):
     return probSpam / (probSpam + probNotSpam)
 
 
-def classify():
+
+def extract_phone_number(message):
+    phone_patterns = [
+        r'\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}',
+        r'\d{3}[-.\s]?\d{4}'
+    ]
+    for pattern in phone_patterns:
+        match = re.search(pattern, message)
+        if match:
+            return match.group()
+    return match.group() if match else None
+
+def extract_email(message):
+    email_pattern = r'[\w.-]+@[\w.-]+\.[a-zA-Z]{2,4}'
+    match = re.search(email_pattern, message)
+    if match:
+        return match.group()
+    return match.group() if match else None
+
+
+def read_pdf_content(file_path):
+    with open(file_path, 'rb') as file:
+        reader = PyPDF2.PdfReader(file)
+        content = ""
+        for page_num in range(len(reader.Pages)):
+            content += reader.pages[page_num].extractText()
+    return content
+
+
+def classify_unknown_resumes():
+    # Train the classifier using DS and Other resumes
     probs = Train()
     probs = filterProbs(probs, 100)
     print("Len Probs: ", len(probs))
-    spamTest = getMessages("data/DSResumes.txt")
-    hamTest = getMessages("data/OtherResumes.txt")
 
-    goodHam = 0
-    goodSpam = 0
+    # Load unknown resumes
+    unknown_resumes = getMessages("data/UnknownResumes.txt")
 
-    for msg in hamTest:
+    ds_classified_without_phone = []
+    other_classified_without_email = []
+    not_extracted_resumes = []
+
+    for msg in unknown_resumes:
+        #if the message is classified as DS
         if getSpamProb(msg, probs) <= .5:
-            goodHam += 1
+            phone_number = extract_phone_number(msg)
+            if not phone_number:
+                ds_classified_without_phone.append(msg)
+            else:
+                print("Classified as DS with phone number:", phone_number)
 
-    for msg in spamTest:
-        if getSpamProb(msg, probs) > .5:
-            goodSpam += 1
+        # If the message is classified as Other
+        else:
+            email = extract_email(msg)
+            if not email:
+                other_classified_without_email.append(msg)
+            else:
+                print(f"Classified as Other with email: {email}")
 
-    print("Classified as DS", goodHam, goodHam / len(hamTest))
-    print("Classified as Other", goodSpam, goodSpam / len(spamTest))
+    # Identify resumes from which we couldn't extract the contact information
+    not_extracted_resumes.extend(ds_classified_without_phone)
+    not_extracted_resumes.extend(other_classified_without_email)
 
-classify()
+    print(f"Resumes classified as DS without phone numbers:", len(ds_classified_without_phone))
+    print(f"Resumes classified as Other without emails:", len(other_classified_without_email))
+    print(f"Resumes from which contact information couldn't be extracted:", len(not_extracted_resumes))
 
 
-# def keyword_classifier(resume_list, keywords):
-#     classified_as_DS = 0
+# Call the function to classify and extract contact info from unknown resumes
+classify_unknown_resumes()
+
+# def classify_unknown_resumes():
+#     # Train the classifier using DS and Other resumes
+#     probs = Train()
+#     probs = filterProbs(probs, 100)
+#     print("Len Probs: ", len(probs))
 #
-#     for resume in resume_list:
-#         if any(keyword in resume for keyword in keywords):
-#             classified_as_DS += 1
+#     # Load unknown resumes
+#     unknown_resumes = getMessages("data/UnknownResumes.txt")
 #
-#     return classified_as_DS
+#     ds_classified_without_phone = []
+#     other_classified_without_email = []
 #
-# #testing with sample keywords
-# keywords = ['data', 'machine', 'learning', 'python', 'statistics']
-# unknown_resumes = getMessages("data/UnknownResumes.txt")
-# classified_as_DS = keyword_classifier(unknown_resumes, keywords)
-# print("Keyword Classified as DS:", classified_as_DS)
+#     for msg in unknown_resumes:
+#         # If the message is classified as DS
+#         if getSpamProb(msg, probs) <= .5:
+#             phone_number = extract_phone_number(msg)
+#             if not phone_number:
+#                 ds_classified_without_phone.append(msg)
+#             else:
+#                 print(f"Classified as DS with phone number: {phone_number}")
 #
+#         # If the message is classified as Other
+#         else:
+#             email = extract_email(msg)
+#             if not email:
+#                 other_classified_without_email.append(msg)
+#             else:
+#                 print(f"Classified as Other with email: {email}")
 #
-# def extract_phone_numbers(text):
-#     pattern = re.compile(r'(\+?(\d{1,3})?[-.\s]?)?(\(?\d{3}\)?[-.\s]?)?(\d{3}[-.\s]?)\d{4}')
-#     return pattern.findall(text)
-#
-# def extract_emails(text):
-#     pattern = re.compile(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}')
-#     return pattern.findall(text)
-#
-#
-# def main():
-# 	probs = Train()
-# 	probs = filterProbs(probs, 100)
-#
-# 	# Naive Bayes Classification
-# 	unknown_probs = classify(probs)
-#
-# 	# Keyword-based Classification
-# 	classified_as_DS = keyword_classifier(unknown_resumes, keywords)
-# 	print("Keyword Classified as DS:", classified_as_DS)
-#
-# 	# Extract Contact Info
-# 	for index, prob in enumerate(unknown_probs):
-# 		if prob > 0.5:  # DS Resume
-# 			print("DS Resume - Phone Numbers:", extract_phone_numbers(unknown_resumes[index]))
-# 		else:  # Other Resume
-# 			print("Other Resume - Emails:", extract_emails(unknown_resumes[index]))
+#     print(f"Resumes classified as DS without phone numbers:", len(ds_classified_without_phone))
+#     print(f"Resumes classified as Other without emails:", len(other_classified_without_email))
 #
 #
-# if __name__ == "__main__":
-# 	main()
+# # Call the function to classify and extract contact info from unknown resumes
+# classify_unknown_resumes()
+
+# def classify():
+#     probs = Train()
+#     probs = filterProbs(probs, 100)
+#     print("Len Probs: ", len(probs))
+#     spamTest = getMessages("data/DSResumes.txt")
+#     hamTest = getMessages("data/OtherResumes.txt")
+#
+#
+#     ds_without_contact_info = []
+#     other_without_contact_info = []
+#
+#     for msg in hamTest:
+#         if getSpamProb(msg, probs) <= .5:
+#             phone_number = extract_phone_number(msg)
+#             if not phone_number:
+#                 ds_without_contact_info.append(msg)
+#
+#     for msg in spamTest:
+#         if getSpamProb(msg, probs) > .5:
+#             email = extract_email(msg)
+#             if not email:
+#                 other_without_contact_info.append(msg)
+#
+#     print(f"DS Resumes without phone numbers:", len(ds_without_contact_info))
+#     print(f"Other Resumes without emails:", len(other_without_contact_info))
+#
+# classify()
+
+
+
+# def classify():
+#     probs = Train()
+#     probs = filterProbs(probs, 100)
+#     print("Len Probs: ", len(probs))
+#     spamTest = getMessages("data/DSResumes.txt")
+#     hamTest = getMessages("data/OtherResumes.txt")
+#
+#     goodHam = 0
+#     goodSpam = 0
+#
+#     for msg in hamTest:
+#         if getSpamProb(msg, probs) <= .5:
+#             goodHam += 1
+#
+#     for msg in spamTest:
+#         if getSpamProb(msg, probs) > .5:
+#             goodSpam += 1
+#
+#     print("Classified as DS", goodHam, goodHam / len(hamTest))
+#     print("Classified as Other", goodSpam, goodSpam / len(spamTest))
+#
+# classify()
+
+
+
+
+
+
+
