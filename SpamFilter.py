@@ -1,7 +1,6 @@
 import re
 import math
 import PyPDF2
-from PyPDF2 import PdfReader
 
 
 def tokenize(message):
@@ -39,6 +38,29 @@ for keyword in keywords:
 def multi_keyword_classifier(keywords, messages):
     classified_as_DS = sum(any(k in tokenize(message) for k in keywords) for message in messages)
     return classified_as_DS
+
+
+
+def classify_with_multi_keywords(keywords, messages):
+    classified_as_DS = sum(any(k in tokenize(message) for k in keywords) for message in messages)
+    return classified_as_DS
+
+
+def classify_unknown_with_multi_keywords():
+
+    unknown_resumes = getMessages("data/UnknownResumes.txt")
+
+    #ssing the multi-keyword classifier on unknown resumes
+    DS_classified_unknown = classify_with_multi_keywords(keywords, unknown_resumes)
+    Other_classified_unknown = len(unknown_resumes) - DS_classified_unknown
+
+    print(f"Using Multi-keyword Classifier:")
+    print(f"Total Resumes in UnknownResumes.txt: {len(unknown_resumes)}")
+    print(f"Total Resumes classified as DS: {DS_classified_unknown}")
+    print(f"Total Resumes classified as Other: {Other_classified_unknown}")
+
+classify_unknown_with_multi_keywords()
+
 
 DS_classified = multi_keyword_classifier(keywords, DS_messages)
 Other_classified = len(Other_messages) - multi_keyword_classifier(keywords, Other_messages)
@@ -153,7 +175,6 @@ def getSpamProb(message, word_probs):
     return probSpam / (probSpam + probNotSpam)
 
 
-
 def extract_phone_number(message):
     phone_patterns = [
         r'\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}',
@@ -166,7 +187,7 @@ def extract_phone_number(message):
     return match.group() if match else None
 
 def extract_email(message):
-    email_pattern =  [r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b']
+    email_pattern =  r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
     match = re.search(email_pattern, message)
     if match:
         return match.group()
@@ -180,7 +201,6 @@ def read_pdf_content(file_path):
         for page_num in range(len(reader.Pages)):
             content += reader.pages[page_num].extractText()
     return content
-
 
 
 def classify_unknown_resumes():
@@ -212,10 +232,13 @@ def classify_unknown_resumes():
     ds_classified_without_phone = []
     other_classified_without_email = []
     not_extracted_resumes = []
+    ds_count = 0
+    other_count = 0
 
     for msg in unknown_resumes:
         #if the message is classified as DS
-        if getSpamProb(msg, probs) <= .5:
+        if getSpamProb(msg, probs) > .5:
+            ds_count += 1
             phone_number = extract_phone_number(msg)
             if not phone_number:
                 ds_classified_without_phone.append(msg)
@@ -223,24 +246,26 @@ def classify_unknown_resumes():
                 print("Classified as DS with phone number:", phone_number)
 
         #if the message is classified as Other
-        else:
+        if getSpamProb(msg, probs) <= .5:
+            other_count += 1
             email = extract_email(msg)
             if not email:
                 other_classified_without_email.append(msg)
             else:
-                print("Classified as Other with email:", email)
+                print("classified as Other with email:", email)
 
     #identify resumes from which we couldn't extract the contact information
     not_extracted_resumes.extend(ds_classified_without_phone)
     not_extracted_resumes.extend(other_classified_without_email)
 
+    print("Total Resumes in UnknownResumes.txt:", len(unknown_resumes))
+    print("Total Resumes classified as DS:", ds_count)
+    print("Total Resumes classified as Other:", other_count)
     print("Resumes classified as DS without phone numbers:", len(ds_classified_without_phone))
     print("Resumes classified as Other without emails:", len(other_classified_without_email))
     print("Resumes from which contact information couldn't be extracted:", len(not_extracted_resumes))
 
 classify_unknown_resumes()
-
-
 
 # def classify():
 #     probs = Train()
